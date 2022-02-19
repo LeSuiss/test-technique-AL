@@ -15,8 +15,9 @@ app.use(express.json());
 app.get('/', async(req: Request, res:Response) => {
   try {  
     const query = req.query
+
+    //add everyparams to QueryUrl
     let urlSearchQuery = `${env.API_URL}/?apikey=${env.API_KEY}`
-    
     Object.keys(query).forEach(function enhanceUrlWithQuery(key:string):string|void{
       if(!!query[key]){
         let formatedValue = query[key].toString()
@@ -25,6 +26,7 @@ app.get('/', async(req: Request, res:Response) => {
       }
     })
 
+    //fetch on cache before calling API
     let valueInCache = await redis.get(urlSearchQuery)
     if (valueInCache?.length>0){
       console.log('Getting ' + urlSearchQuery + ' from cache' )
@@ -34,6 +36,7 @@ app.get('/', async(req: Request, res:Response) => {
       return axios.get(urlSearchQuery)
       .then(axiosResponse=>{
 
+        //set cache for 1 day
         console.log('Setting ' + urlSearchQuery + ' in cache for 24h' )
         redis.set(urlSearchQuery, JSON.stringify(axiosResponse.data), "EX", 86400)
         res.send(axiosResponse.data)

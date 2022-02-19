@@ -3,7 +3,7 @@ const app = require("./app");
 
 
 test('API call is returning a JSON',()=>request(app)
-  .get("/getMovieList")
+  .get("/")
   .send({title:"the godfather"})
   .expect("Content-Type", /json/)
   .expect(200)

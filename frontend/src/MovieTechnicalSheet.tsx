@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { Autocomplete, Card, CardContent, CardMedia, TextField, Typography } from '@mui/material';
+
+import { Card, CardContent, CardMedia, Typography } from '@mui/material';
 import { movieDescription } from './App';
-
-
 
 const MovieTechnicalSheet=(props:movieDescription|undefined)=>
     <Card sx={{ maxWidth: 345 }} className="MovieCard">

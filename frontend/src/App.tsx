@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Autocomplete, Card, CardContent, CardMedia, TextField, Typography } from '@mui/material';
+import { Autocomplete,  TextField} from '@mui/material';
 import axios from 'axios';
 import './App.css'
 
@@ -9,11 +9,11 @@ import { useDebounce } from 'use-debounce';
 
 
 export interface movie{ 
-    "Title"?:string,
-    "Year"?: string,
-    "imdbID"?:string,
-    "Type"?: string,
-    "Poster"?:string}
+    "Title":string,
+    "Year": string,
+    "imdbID":string,
+    "Type": string,
+    "Poster":string}
 
 type movieList = movie[]
 
@@ -50,50 +50,51 @@ const [search,setSearch]= useState<string| undefined>('')
 const [debouncedSearch]=useDebounce(search, 1000)
 const [selectedMovie, setSelectedMovie]=useState<movieDescription>()
 
-useEffect(() => {
-  !!debouncedSearch && debouncedSearch?.length>3 && 
-  axios.get('http://localhost:3002',{params:  {s: debouncedSearch}} )
-  .then(res=>{
-    console.log('setting',)
-  if(res.data.Response === "False" ) return
-  setAPI(res.data?.Search)
-  })
-
-}, [debouncedSearch])
-
-const fetchSpecifics=(id:string|undefined)=>{
-
-  axios.get('http://localhost:3002/',{params:  {i: id}} )
+const fetchMovieSpecifics=(id:string|undefined)=>{
+  axios.get(`${process.env.REACT_APP_BACKEND_URL}`,{params:  {i: id}} )
   .then(res=>{
   if(res.data.Response === "False" ) return
-  console.log(res.data.Search)
   setSelectedMovie(res.data)
   })
 
 }
+
+//launch search suggestion only if 3characters (or more) + debounce 1s
 useEffect(() => {
-  API?.length===1 && fetchSpecifics(API[0]?.imdbID)  
+  !!debouncedSearch && debouncedSearch?.length>2 && 
+  axios.get(`${process.env.REACT_APP_BACKEND_URL}`,{params:  {s: debouncedSearch}} )
+  .then(res=>{
+  if(res.data.Response === "False" ) return
+  setAPI(res.data?.Search)
+  })
 }, [debouncedSearch])
 
+
+//Auto fetch technicalSheet if Search result in a single result
+useEffect(() => {
+  API?.length===1 && fetchMovieSpecifics(API[0]?.imdbID)  
+}, [API])
+
   return (
-    <div>
-    <Autocomplete
-      disablePortal
-      inputValue={search}
-      onInputChange={(event, newInputValue) => {
-        setSearch(newInputValue);
-      }}
-      onChange={(event: any, newValue: any) => fetchSpecifics(newValue.imdbID)}
-      options={API?.map(movie=>({label:movie?.Title+'__'+movie?.Year, imdbID:movie?.imdbID}))??[]}
-      sx={{ width: 300 }}
-      renderInput={(params) => <TextField {...params} label="Movie" />}
-    />
-
-
-{selectedMovie &&
-<MovieTechnicalSheet {...selectedMovie}/>
-}
-    </div>
+    <>
+      <Autocomplete
+        disablePortal
+        inputValue={search}
+        onInputChange={(event, newInputValue) => {
+          //change input value only if is no a selection from guess list
+          if(! newInputValue.includes('__') ){
+            setSearch(newInputValue);
+          }
+        }}
+        onChange={(event: any, newValue: any) => fetchMovieSpecifics(newValue.imdbID)}
+        options={API?.map(movie=>({label:movie?.Title+'__'+movie?.Year, imdbID:movie?.imdbID}))??[]}
+        sx={{ width: 300 }}
+        renderInput={(params) => <TextField {...params} label="Movie" />}
+      />
+      {selectedMovie &&
+      <MovieTechnicalSheet {...selectedMovie}/>
+      }
+    </>
   )
 }
 

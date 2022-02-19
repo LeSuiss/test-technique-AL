@@ -3,6 +3,6 @@ width: 140px !important;
 height: 240px !important;
 }
 
-.MovieCard * :not(.MovieCard) {
-  display: flex;
+.MovieCard {
+  display: flex !important;
 }
