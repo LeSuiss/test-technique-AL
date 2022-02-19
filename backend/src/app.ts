@@ -6,20 +6,21 @@ const port = 3002;
 const Redis = require("ioredis");
 const redis = new Redis(); // uses defaults unless given configuration object
 const env = require('dotenv').config().parsed
-const bodyParser = require('body-parser')
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(bodyParser.raw());
+const cors = require('cors');
+app.use(cors({origin:'*'}));
+app.use(express.json());
 
-app.get('/getMovieList', async(req: Request, res:Response) => {
+
+app.get('/', async(req: Request, res:Response) => {
   try {  
-    const query = req.body
+    const query = req.query
     let urlSearchQuery = `${env.API_URL}/?apikey=${env.API_KEY}`
     
     Object.keys(query).forEach(function enhanceUrlWithQuery(key:string):string|void{
       if(!!query[key]){
-        let formatedValue = query[key].replaceAll(' ', '+')
+        let formatedValue = query[key].toString()
+        formatedValue.replace(/' '/g, '+')
         return urlSearchQuery += `&${key}=${formatedValue}`
       }
     })

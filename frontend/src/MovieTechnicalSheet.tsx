@@ -4,13 +4,10 @@ import { movieDescription } from './App';
 
 
 
-const MovieTechnicalSheet=(props:movieDescription|undefined)=>{
-
-  return (
-
-    <Card sx={{ maxWidth: 345 }}>
-      ZZS
+const MovieTechnicalSheet=(props:movieDescription|undefined)=>
+    <Card sx={{ maxWidth: 345 }} className="MovieCard">
       <CardMedia
+        className="containedImage"
         component="img"
         height="140"
         image={props?.Poster}
@@ -25,7 +22,6 @@ const MovieTechnicalSheet=(props:movieDescription|undefined)=>{
         </Typography>
       </CardContent>
     </Card>
-  )
-}
+  
 
 export default MovieTechnicalSheet
