@@ -22,3 +22,7 @@ run npm install then npm start.
 # testing
 BACKEND is tetable, run npm run test while in /backend
 If so you are good to procede to next step.
+
+# To be improved
+cache is singlely hanlde in backend, adding it in front would be profitable(react query).
+
